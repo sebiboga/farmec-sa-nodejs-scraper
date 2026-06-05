@@ -244,7 +244,7 @@
     <div class="logo">
       <a href="https://peviitor.ro/" target="_blank">peviitor</a>
     </div>
-<a href="https://github.com/sebiboga/farmec-sa-nodejs-scraper/blob/main/docs/README.md" target="_blank">Documentație</a>
+<a href="https://github.com/sebiboga/farmec-sa-nodejs-scraper" target="_blank">Documentație</a>
   </header>
 
   <div class="container">
@@ -255,7 +255,7 @@
       
       <div class="scraper-info">
         <h1>FARMEC SA</h1>
-        <p>job_seeker_ro_spider — scraper automat pentru job-urile Borg Design Romania.</p>
+        <p>job_seeker_ro_spider — scraper automat pentru job-urile Farmec SA.</p>
         
         <div class="stats">
           <div class="stat">
@@ -275,8 +275,8 @@
         <div class="features">
           <h3>Ce face acest scraper:</h3>
           <ul>
-            <li>Extrage job-uri de pe Borg Design Careers</li>
-            <li>Parsează job-uri din ASP.NET WebForms</li>
+            <li>Extrage job-uri de pe site-ul Farmec</li>
+            <li>Parsează job-uri din ejobs.ro</li>
             <li>Validează compania via ANAF</li>
             <li>Salvează în SOLR pentru peviitor.ro</li>
           </ul>
@@ -301,7 +301,6 @@
 
   <footer class="footer">
     <a href="https://github.com/sebiboga/farmec-sa-nodejs-scraper" target="_blank">GitHub</a> •
-    <a href="https://github.com/sebiboga/farmec-sa-nodejs-scraper/blob/main/docs/README.md" target="_blank">Documentație</a> •
     <a href="https://peviitor.ro/" target="_blank">peviitor.ro</a>
   </footer>
 
@@ -357,7 +356,7 @@
           }
         }
         
-        const cRes = await fetch('https://api.peviitor.ro/v1/company/?cif=14837428', {
+        const cRes = await fetch('https://api.peviitor.ro/v1/company/?cif=199150', {
           headers: {
             'origin': 'https://peviitor.ro',
             'referer': 'https://peviitor.ro/'

@@ -1,8 +1,8 @@
-name: Scrape jobs
+name: WebScraper FARMEC to Peviitor
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 6 * * *'
   workflow_dispatch:
 
 jobs:
@@ -10,24 +10,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm install
 
-    - name: Scrape jobs
-      run: node index.js
-      env:
-        SOLR_AUTH: ${{ secrets.SOLR_AUTH }}
+      - name: Run scraper
+        run: node index.js
+        env:
+          SOLR_AUTH: ${{ secrets.SOLR_AUTH }}
 
-    - name: Upload jobs.json artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: jobs
-        path: jobs.json
+      - name: Check for new jobs
+        run: |
+          if [ -f jobs.json ]; then
+            echo "New jobs found:"
+            cat jobs.json | jq '.jobs | length'
+          else
+            echo "No new jobs or scrape failed"
+          fi
+
+      - name: Upload jobs JSON
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: scraped-jobs
+          path: |
+            jobs.json
+            jobs_existing.json
+          retention-days: 7
