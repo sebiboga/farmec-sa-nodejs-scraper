@@ -1,0 +1,54 @@
+name: Cleanup wrong CIF data
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Delete FARMECUL COPILARIEI company core
+        env:
+          SOLR_AUTH: ${{ secrets.SOLR_AUTH }}
+        run: |
+          echo "Deleting company FARMECUL COPILARIEI S.R.L. (CIF 40648509)..."
+          curl -s --user "${SOLR_AUTH}" \
+            "https://solr.peviitor.ro/solr/company/update?commit=true" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            --data-binary '{"delete":{"query":"id:40648509"}}'
+          echo "Done."
+
+      - name: Delete jobs with wrong CIF
+        env:
+          SOLR_AUTH: ${{ secrets.SOLR_AUTH }}
+        run: |
+          echo "Deleting jobs with CIF 40648509..."
+          curl -s --user "${SOLR_AUTH}" \
+            "https://solr.peviitor.ro/solr/job/update?commit=true" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            --data-binary '{"delete":{"query":"cif:40648509"}}'
+          echo "Done."
+
+      - name: Verify cleanup
+        env:
+          SOLR_AUTH: ${{ secrets.SOLR_AUTH }}
+        run: |
+          echo "Verifying company core..."
+          curl -s --user "${SOLR_AUTH}" \
+            "https://solr.peviitor.ro/solr/company/select?q=id:40648509&wt=json" | \
+            jq '.response.numFound' | xargs -I{} echo "Companies with CIF 40648509: {}"
+
+          echo "Verifying job core..."
+          curl -s --user "${SOLR_AUTH}" \
+            "https://solr.peviitor.ro/solr/job/select?q=cif:40648509&wt=json" | \
+            jq '.response.numFound' | xargs -I{} echo "Jobs with CIF 40648509: {}"
+
+          echo "Verifying FARMEC SA company core..."
+          curl -s --user "${SOLR_AUTH}" \
+            "https://solr.peviitor.ro/solr/company/select?q=id:199150&wt=json" | \
+            jq '.response.numFound' | xargs -I{} echo "Companies with CIF 199150: {}"
