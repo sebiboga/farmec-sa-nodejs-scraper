@@ -89,10 +89,10 @@ describe("extractEJobs", () => {
     const jobs = extractEJobs(html);
     expect(jobs).toHaveLength(2);
     expect(jobs[0].title).toBe("Gestionar Depozit");
-    expect(jobs[0].url).toBe("https://www.ejobs.ro/job/gestionar-depozit-1960293");
+    expect(jobs[0].url).toBe("https://www.ejobs.ro/user/locuri-de-munca/gestionar-depozit/1960293");
     expect(jobs[0].department).toBe("eJobs");
     expect(jobs[1].title).toBe("Analist servicii clienți");
-    expect(jobs[1].url).toBe("https://www.ejobs.ro/job/analist-servicii-clienti-1959869");
+    expect(jobs[1].url).toBe("https://www.ejobs.ro/user/locuri-de-munca/analist-servicii-clienti/1959869");
   });
 
   test("returns empty array when no Nuxt data found", () => {

@@ -97,7 +97,7 @@ function extractEJobs(html) {
         jobs.push({
           title: resolved.title,
           department: "eJobs",
-          url: slug ? `https://www.ejobs.ro/job/${slug}-${resolved.id}` : ""
+          url: slug ? `https://www.ejobs.ro/user/locuri-de-munca/${slug}/${resolved.id}` : ""
         });
       }
     }
