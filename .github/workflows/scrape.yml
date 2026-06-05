@@ -17,16 +17,6 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Cleanup wrong CIF data
-        env:
-          SOLR_AUTH: ${{ secrets.SOLR_AUTH }}
-        run: |
-          curl -s --user "${SOLR_AUTH}" \
-            "https://solr.peviitor.ro/solr/job/update?commit=true" \
-            -X POST \
-            -H "Content-Type: application/json" \
-            --data-binary '{"delete":{"query":"cif:40648509"}}' || true
-
       - name: Install dependencies
         run: npm install
 
