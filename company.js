@@ -6,6 +6,7 @@ import { getCompanyFromANAF, searchCompany, getCompanyFromANAFWithFallback } fro
 const Peviitor_API_URL = "https://api.peviitor.ro/v1/company/";
 
 const COMPANY_BRAND = "FARMEC";
+const COMPANY_CIF = "199150";
 
 export function getCompanyBrand() {
   return COMPANY_BRAND;
@@ -113,58 +114,33 @@ export async function getCompanyData() {
   const cachedData = loadCachedCompanyData();
 
   if (!cachedData?.summary?.cif) {
-    console.log(`Searching for company with brand: ${COMPANY_BRAND}`);
-    const searchResults = await searchCompany(COMPANY_BRAND);
+    console.log(`Using known CIF: ${COMPANY_CIF}`);
+    console.log(`Fetching company details for CIF: ${COMPANY_CIF}`);
+    const anafData = await getCompanyFromANAFWithFallback(COMPANY_CIF, null);
 
-    if (!searchResults || searchResults.length === 0) {
-      throw new Error(`No companies found for brand: ${COMPANY_BRAND}`);
-    }
-
-    const exactMatch = searchResults.find(c => 
-      c.name.toUpperCase().includes(COMPANY_BRAND.toUpperCase()) &&
-      c.statusLabel === "Funcțiune"
-    );
-
-    if (!exactMatch) {
-      console.log("No exact match with 'Funcțiune' status, trying first active company...");
-      const activeMatch = searchResults.find(c => c.statusLabel === "Funcțiune");
-      if (!activeMatch) {
-        throw new Error(`No active company found for brand: ${COMPANY_BRAND}`);
-      }
-      var selectedCIF = activeMatch.cui;
-      console.log(`Selected: ${activeMatch.name} (CIF: ${selectedCIF})`);
-    } else {
-      var selectedCIF = exactMatch.cui;
-      console.log(`Found exact match: ${exactMatch.name} (CIF: ${selectedCIF})`);
-    }
-
-    console.log(`Fetching company details for CIF: ${selectedCIF}`);
-    const anafData = await getCompanyFromANAFWithFallback(selectedCIF, cachedData?.anaf);
-
-    if (!anafData) throw new Error("No data from ANAF and no cache - cannot proceed");
+    if (!anafData) throw new Error("No data from ANAF - cannot proceed");
     if (!anafData.name) throw new Error("ANAF returned no company name");
-    if (!anafData.cui) throw new Error("ANAF returned no CUI");
 
     console.log(`ANAF returned name: ${anafData.name}`);
     console.log(`ANAF returned CUI: ${anafData.cui}`);
     console.log(`ANAF status: ${anafData.inactive ? "INACTIVE" : "ACTIVE"}`);
 
     const company = anafData.name.toUpperCase();
-    const cif = anafData.cui.toString();
+    const cif = COMPANY_CIF;
     const active = !anafData.inactive;
 
     return { company, cif, active, anafData };
   } else {
-    console.log(`Using cached company data for CIF: ${cachedData.summary.cif}`);
-    const anafData = cachedData.anaf;
+    console.log(`Using cached company data for CIF: ${COMPANY_CIF}`);
+    const anafData = cachedData.anaf || { name: cachedData.summary.company, cui: COMPANY_CIF };
 
     console.log(`Cached name: ${anafData.name}`);
     console.log(`Cached CUI: ${anafData.cui}`);
     console.log(`Cached status: ${anafData.inactive ? "INACTIVE" : "ACTIVE"}`);
 
-    const company = anafData.name.toUpperCase();
-    const cif = anafData.cui.toString();
-    const active = !anafData.inactive;
+    const company = (anafData.name || cachedData.summary.company).toUpperCase();
+    const cif = COMPANY_CIF;
+    const active = cachedData.summary.active !== false;
 
     return { company, cif, active, anafData };
   }
